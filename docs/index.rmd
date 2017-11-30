@@ -133,3 +133,40 @@ ggplot (mpg, aes (x = class, y = hwy, fill = class)) +
   
 
 ```
+
+# Data Wrangling with `dplyr`
+```{r dplyr}
+# read in RAW data from OHI github--raw button on top right
+gapminder <- read_csv("https://raw.githubusercontent.com/OHI-Science/data-science-training/master/data/gapminder.csv")
+
+### useful functions to get to know your data
+head (gapminder)
+tail (gapminder)
+
+str (gapminder)
+
+names (gapminder)
+
+dim (gapminder)
+
+summary (gapminder)
+
+# select columns with $
+## hot tip! command + l or r arrow jumps from front to back of line. option + l or r arrow jumps between words, operators, etc. Holding down shift while you do that highlights as you go. 
+head( gapminder$lifeExp)
+```
+
+### Dplyr functions
+
+#### Filter
+```{r filter}
+filter (gapminder, lifeExp < 29)
+filter(gapminder, country == "Mexico")
+
+# challenge: what is the mean life expectancy of sweden? Do in 2 variables.
+sweden <- filter (gapminder, country == "Sweden")
+mn.sweden <- mean (sweden$lifeExp)
+
+filter (gapminder, country == "Sweden") %>%
+  summarise (mn = mean (lifeExp))
+```
