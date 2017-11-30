@@ -19,6 +19,8 @@ library (tidyverse)
 
 Use data() to view available R datasets. Use ?mpg to read more about the specific dataset/metadata. 
 
+Use backticks around words to put them in "code font" E.g. `geom_scatter`
+
 ### Scatterplot
 ```{r mpg}
 # mpg
@@ -26,10 +28,62 @@ Use data() to view available R datasets. Use ?mpg to read more about the specifi
 g <- ggplot (data = mpg,
              aes (x = displ, y = hwy)) 
 g + geom_point()
-```
-
-### Color! Going DEEPER INTO HEADINGS
-```{r}
 
 ```
+
+#### Color! Going DEEPER INTO HEADINGS
+```{r color scatter}
+g + geom_point (aes (color = class))
+```
+
+#### Use shape for a b&w figure
+Changed `color` to `shape`
+
+```{r b&w}
+g + geom_point (aes (shape = class))
+```
+```{r color and size}
+g + geom_point (aes (color = fl, size = class))
+```
+#### Exercise:
+Scatter hwy vs cty, size represents class and color represents fuel type
+
+```{r scatter exercise}
+ggplot (mpg, aes (x = cty, y = hwy, size = class, col = fl)) +
+  geom_point()
+```
+5.5 exercises. 
+
+1: color = "blue" should be outside of aesthetic. 
+```{r 5.5 1}
+
+ggplot(data = mpg) + 
+      geom_point(aes(x = displ, y = hwy, color = "blue")) +
+  ggtitle ("Wrong")
+
+ggplot(data = mpg) + 
+      geom_point(aes(x = displ, y = hwy), color = "blue") +
+  ggtitle ("Right")
+```
+
+
+2: plot hw vs disply, color indicates city
+```{r 5.5 2}
+ggplot (mpg, aes (x = displ, y = hwy, col = cty)) +
+  geom_point()
+```
+3: now use shape for cty. Doesn't work bc cty is a continuous variable--can't have a shape mapping. 
+```{r 5.5 3, eval = FALSE}
+ggplot (mpg, aes (x = displ, y = hwy, shape = cty)) +
+  geom_point()
+```
+
+4: map aesthetic to something other than variable, e.g displ < 5. Yields two colors reflecting true/false
+```{r 5.5 4}
+
+ggplot (mpg, aes (x = displ, y = hwy, col = displ < 5)) +
+  geom_point()
+
+```
+
 
