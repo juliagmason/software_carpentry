@@ -12,6 +12,7 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library (tidyverse)
+library (beyonce)
 
 ```
 
@@ -45,14 +46,13 @@ g + geom_point (aes (shape = class))
 ```{r color and size}
 g + geom_point (aes (color = fl, size = class))
 ```
-#### Exercise:
+#### 5.5 Exercises:
 Scatter hwy vs cty, size represents class and color represents fuel type
 
 ```{r scatter exercise}
 ggplot (mpg, aes (x = cty, y = hwy, size = class, col = fl)) +
   geom_point()
 ```
-5.5 exercises. 
 
 1: color = "blue" should be outside of aesthetic. 
 ```{r 5.5 1}
@@ -86,4 +86,50 @@ ggplot (mpg, aes (x = displ, y = hwy, col = displ < 5)) +
 
 ```
 
+## Geoms
 
+```{r geom_examples}
+
+ggplot (mpg, aes (x = drv, y = hwy)) +
+  geom_jitter()
+
+ggplot (mpg, aes (x = drv, y = hwy)) +
+  geom_violin()
+
+
+```
+
+## Geoms on geoms
+```{r geomception}
+
+ggplot (mpg, aes (x = displ, y = hwy)) +
+  geom_point () +
+  geom_smooth ()
+
+```
+## Customize
+```{r customize}
+ggplot (mpg, aes (x = displ, y = hwy)) +
+  geom_point () +
+  geom_smooth () +
+  labs (title = "Rltp btw engine size and hwy mpg",
+       x = "Engine displacement (l)", 
+       y = "Hwy mpg") +
+  theme_minimal () +
+  theme (text = element_text(size = 16))
+```
+
+### A CHALLENGE (5.9)
+Create a beautiful graph
+```{r beautify challenge}
+
+
+ggplot (mpg, aes (x = class, y = hwy, fill = class)) +
+  geom_violin(size = 0) + # removes outline
+  theme_bw() +
+  scale_fill_manual (values = beyonce_palette(74)) +
+  labs (fill = "Car type") +
+  theme (axis.text = element_text (angle = 45, hjust = 1))
+  
+
+```
