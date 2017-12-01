@@ -274,3 +274,113 @@ gap_2007_rj <- gapminder %>%
   right_join (co2)
 
 ```
+## tidyr data wrangling
+
+### Example data sets
+```{r tidyr example data}
+
+# wide data
+AirPassengers
+
+# long data
+mpg
+
+```
+```{r gapminder_versions}
+gap_wide <- read_csv("https://raw.githubusercontent.com/OHI-Science/data-science-training/master/data/gapminder_wide.csv")
+
+gapminder <- read_csv('https://raw.githubusercontent.com/OHI-Science/data-science-training/master/data/gapminder.csv')
+
+```
+## `gather()`
+use gather to turn `gap_wide` into a long format dataset. "Key" is the name of a new column, which will be filled with current column names. "Value" is the name of a new column which will be filled with current values. 
+
+Here, we want to keep continent and country, and collapse the rest of the columns next to them by year. 
+```{r gather_gap_wide}
+
+gap_long <- gap_wide %>%
+  gather (key = obstype_year,
+          value = obs_values,
+          dplyr::starts_with("pop"),
+          dplyr::starts_with("lifeExp"),
+          dplyr::starts_with("gdpPercap"))
+  )
+
+## or, a slightly faster way:
+gap_long <- gap_wide %>%
+  gather (key = obstype_year,
+          value = obs_values,
+          -continent, - country)
+  )
+
+# not super useful to have _year in the column. Want a separate column for year. 
+
+gap_long <- gap_wide %>%
+  gather (key = obstype_year,
+          value = obs_values,
+          -continent, - country) %>%
+  separate (obstype_year, 
+            into = c("obs_type", "year"), # new column names
+            sep = "_",
+            convert = TRUE) # automatically converts year to integer
+  
+  
+
+## what if I wanted a separate column for lifeExp, pop, etc.?
+gap_long_2 <- gap_wide %>%
+  gather (key = lifeExp_yr, value = lifeExp,
+          dplyr::starts_with("lifeExp")) %>%
+  gather (key = gdpPercap_yr, value = gdpPercap,
+          dplyr::starts_with("gdpPercap")) %>%
+  gather (key = pop_yr, value = pop,
+          dplyr::starts_with("pop")) %>% 
+  separate (lifeExp_yr, into = c ("obstype", "year"),
+            sep = "_", 
+            convert = TRUE) %>%
+  distinct (continent, country, year, .keep_all = TRUE) %>%
+  select (continent, country, year, lifeExp, gdpPercap, pop)
+
+# we should use spread.
+gap_normal <- gap_long %>% 
+  spread(obs_type, obs_values)
+
+```
+## plot long format data
+```{r}
+life_df <- gap_long %>%
+  filter (obs_type == "lifeExp",
+          continent == "Americas")
+
+ggplot (data = life_df, aes (x = year, y = obs_values, col = country)) +
+  geom_line()
+```
+## 7.7 exercise
+calc and plot mean life exp for each continent over time, 1982 to 2007
+```{r 7.7_exercise}
+
+gap_long %>%
+  filter (between (year, 1982, 2007), obs_type == "lifeExp") %>%
+  group_by (continent, year) %>%
+  summarise (mn_exp = mean (obs_values, na.rm = TRUE)) %>%
+  ggplot (aes (x = year, y = mn_exp, col = continent)) +
+    geom_line() +
+  ggtitle ("Mean life expectancy over time") +
+  labs (x = "Year", y = "Mean life expectancy")
+
+```
+## `spread()`
+key is the name of the column in the original data frame that has the values you want to spread. Gather, THEN spread!
+```{r spread}
+gap_normal <- gap_long %>% 
+  spread(obs_type, obs_values)
+```
+
+## exercise 7.8
+convert gap_long back to gap_wide
+```{r 7.8_exercise}
+gap_wide_2 <- gap_long %>%
+  unite (obs_type, year, col = obstype,
+         sep = "_") %>%
+  spread (obstype, obs_values)
+```
+
