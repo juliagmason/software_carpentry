@@ -254,3 +254,23 @@ gapminder %>%
   arrange (desc (max_gpc, desc))
 
 ```
+## joins
+```{r joins}
+## read in data from OHI book
+co2 <- read_csv("https://raw.githubusercontent.com/OHI-Science/data-science-training/master/data/co2.csv")
+# this is just for 2007
+
+# create new gapminder variable with just 2007 data
+gap_2007 <- gapminder %>% 
+  filter (year == 2007) %>%
+  left_join (co2, by = "country")
+
+gap_2007 %>% dim()
+# gap_2007 %>% View() # can't have this in knitted document
+
+# right join gapminder to co2 (only countries beginning with A)
+gap_2007_rj <- gapminder %>% 
+  filter (year == 2007) %>%
+  right_join (co2)
+
+```
