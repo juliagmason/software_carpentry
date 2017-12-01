@@ -163,6 +163,8 @@ head( gapminder$lifeExp)
 filter (gapminder, lifeExp < 29)
 filter(gapminder, country == "Mexico")
 
+filter (gapminder, country == "Mexico", year == 2002)
+
 # challenge: what is the mean life expectancy of sweden? Do in 2 variables.
 sweden <- filter (gapminder, country == "Sweden")
 mn.sweden <- mean (sweden$lifeExp)
@@ -170,11 +172,85 @@ mn.sweden <- mean (sweden$lifeExp)
 ```
 ## Pipe operator 
 shortcut: cmd + shift + m 
+indenting code: select and then cmd + i
 ```{r pipe}
 gapminder %>% head
 
 gapminder %>% 
   filter (country == "Sweden") %>% 
   summarise (mn = mean (lifeExp))
+
+
 ```
 
+## select by columns
+```{r select}
+select (gapminder, year, lifeExp)
+
+gapminder %>%
+  select (year, lifeExp) %>%
+  tail
+
+
+## combine it!
+
+gapminder %>%
+  filter (country == "Cambodia") %>%
+  select (1, 2, 5)
+
+gapminder %>% 
+  select (-continent, -lifeExp)
+```
+## `mutate()` to add columns
+
+Add new column, gdp. Population * gdp per cap
+```{r mutate}
+
+gapminder %>%
+  mutate (gdp = pop * gdpPercap,
+          index = 1:nrow(gapminder))
+
+
+```
+### Exercise: find max gdp per capita for egypt and vietnam, create new column
+```{r gapminder pipe exercise}
+
+gapminder %>%
+  filter (country %in% c("Egypt", "Vietnam")) %>%
+  # group_by (country) %>%
+  mutate (max_gdp = max (gdpPercap))
+
+# gapminder %>% filter (country == c("Egypt", "Vietnam"))
+
+# group_by
+gapminder %>%
+  # filter (country %in% c("Egypt", "Vietnam")) %>%
+  group_by (country) %>%
+  summarise (max_gdp = max (gdpPercap), min_gdp = min (gdpPercap), count = n(), mean_lifeExp = mean (lifeExp))
+
+# keep year associated with max_gdp
+gapminder %>%
+  
+  group_by (country) %>%
+  mutate (max_gdpPercap = max (gdpPercap)) %>%
+  filter (gdpPercap == max_gdpPercap) 
+
+# OR
+
+gapminder %>%
+ 
+  group_by (country) %>%
+  #mutate (max_gdpPercap = max (gdpPercap)) %>%
+  filter (gdpPercap == max(gdpPercap) )
+
+# OR
+
+gapminder %>%
+  # filter (country %in% c("Egypt", "Vietnam")) %>%
+  group_by (country) %>%
+  # mutate (max_gdpPercap = max (gdpPercap)) %>%
+  # filter (gdpPercap == max(gdpPercap) )
+  summarise (max_gpc = max (gdpPercap), year = gapminder$year[which (gapminder$gdpPercap == max_gpc)]) %>%
+  arrange (desc (max_gpc, desc))
+
+```
